@@ -127,3 +127,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+static/
+posts/static/
+
+posts/migrations
+sent_emails
