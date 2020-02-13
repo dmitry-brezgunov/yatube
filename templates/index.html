@@ -1,12 +1,19 @@
 {% extends "base.html" %}
 {% block title %} Последние обновления {% endblock %}
 {% block content %}
-    {% for post in posts %}
+
+<h1> Последние обновления на сайте</h1>
+
+{% for post in page %}
     <h3>
-        Автор: {{ post.author.get_full_name }}, Дата публикации: {{ post.pub_date|date:"d M Y" }}
+        Автор: <a href="/{{ post.author.username }}/" style="text-decoration: none">{{ post.author.get_full_name }}</a>, Дата публикации: <a href="/{{ post.author.username }}/{{ post.pk }}/" style="text-decoration: none">{{ post.pub_date|date:"d M Y" }}</a>
     </h3>
     <p>{{ post.text|linebreaksbr }}</p>
-    <hr>
-    {% endfor %}
+    <hr class="border border-primary">
+{% endfor %}
+
+{% if page.has_other_pages %}
+    {% include "paginator.html" with items=page paginator=paginator%}
+{% endif %}
 
 {% endblock %}

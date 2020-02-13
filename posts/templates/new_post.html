@@ -1,12 +1,12 @@
 {% extends "base.html" %}
-{% block title %}Опубликовать пост{% endblock %}
+{% block title %}{{ title }} запись{% endblock %}
 {% block content %}
 {% load user_filters %}
 
 <div class="d-flex flex-column">
   <div class="p-5">
     <div class="card">
-      <div class="card-header text-center">Опубликовать пост</div>
+      <div class="card-header text-center">{{ title }} запись</div>
       <div class="card-body">
         <form method="POST">
           {% csrf_token %}
@@ -24,7 +24,7 @@
           {% endfor %}
           <div class="col-md-6 offset-md-5">              
             <button type="submit" class="btn btn-primary">
-              Опубликовать
+              {{ title }}
             </button>
           </div>
         </form>

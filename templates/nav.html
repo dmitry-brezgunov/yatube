@@ -7,7 +7,7 @@
     <div class="navbar-nav">
       {% if user.is_authenticated %}
       <span class="navbar-text text-reset">Пользователь: {{ user.username }}.</span>
-      <a class="nav-item nav-link" href="{% url 'new_post' %}">Опубликовать пост</a>
+      <a class="nav-item nav-link" href="{% url 'new_post' %}">Опубликовать запись</a>
       <span class="navbar-text">|</span>
       <a class="nav-item nav-link" href="{% url 'password_change' %}">Изменить пароль</a>
       <span class="navbar-text">|</span>
