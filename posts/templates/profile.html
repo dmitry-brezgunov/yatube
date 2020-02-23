@@ -50,6 +50,7 @@
               <!-- Ссылка на редактирование, показывается только автору записи -->
               {% if user == profile %}
               <a class="btn btn-sm text-muted" href="/{{ profile.username }}/{{ post.pk }}/edit" role="button">Редактировать</a>
+              <a class="btn btn-sm text-muted" href="/{{ profile.username }}/{{ post.pk }}/delete" role="button">Удалить</a>
               {% endif %}
             </div>
             <!-- Дата публикации  -->

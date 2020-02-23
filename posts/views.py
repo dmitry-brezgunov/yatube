@@ -3,13 +3,12 @@ from django.shortcuts import redirect
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from django.http import HttpResponseForbidden
 
 from .models import Post, Group, User
 from .forms import PostForm
 
 def index(request):
-    post_list = Post.objects.order_by("-pub_date").all()
+    post_list = Post.objects.select_related('author').order_by("-pub_date").all()
     paginator = Paginator(post_list, 10) # показывать по 10 записей на странице.
     page_number = request.GET.get('page') # переменная в URL с номером запрошенной страницы
     page = paginator.get_page(page_number) # получить записи с нужным смещением
@@ -17,8 +16,11 @@ def index(request):
 
 def group_posts(request, slug):
     group = get_object_or_404(Group, slug=slug)
-    posts = Post.objects.filter(group=group).order_by("-pub_date")[:12]
-    return render(request, "group.html", {"group": group, "posts": posts})
+    post_list = Post.objects.filter(group=group).select_related('author').order_by("-pub_date").all()
+    paginator = Paginator(post_list, 10)
+    page_number = request.GET.get('page')
+    page = paginator.get_page(page_number)
+    return render(request, "group.html", {"group": group, "page": page, 'paginator': paginator})
 
 @login_required
 def new_post(request):
@@ -29,7 +31,7 @@ def new_post(request):
             post = form.save(commit=False)
             post.author = request.user
             post.save()
-            return redirect('post', post_id=post.pk, username=post.author)
+            return redirect('index')
     else:
         form = PostForm()
     return render(request, 'new_post.html', {'form': form, 'title':title})
@@ -53,18 +55,24 @@ def profile(request, username):
 def post_edit(request, username, post_id):
     title = 'Редактировать'
     post = get_object_or_404(Post, pk=post_id)
-    user_profile = request.user
-    if user_profile.username == username:
+    if request.user == post.author:
         if request.method == "POST":
             form = PostForm(request.POST, instance=post)
             if form.is_valid():
                 post = form.save(commit=False)
-                post.author = user_profile
                 post.pub_date = timezone.now()
                 post.save()
-                return redirect('post', post_id=post.pk, username=post.author)
+                return redirect('post', post_id=post.pk, username=username)
         else:
             form = PostForm(instance=post)
     else:
-        return HttpResponseForbidden()
-    return render(request, "new_post.html", {'form': form, 'title':title})
+        return redirect('post', post_id=post.pk, username=post.author)
+    return render(request, "new_post.html", {'form': form, 'title':title, 'post':post})
+
+@login_required
+def post_delete(request, username, post_id):
+    post = get_object_or_404(Post, pk=post_id)
+    if request.user == post.author:
+        post.delete()
+        return redirect('profile', username=username)
+    return redirect('post', post_id=post.pk, username=post.author)

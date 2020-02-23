@@ -7,5 +7,8 @@ from .forms import CreationForm
 
 class SignUp(CreateView):
     form_class = CreationForm
-    success_url = "/auth/login/"
+    success_url = reverse_lazy("login")
     template_name = "signup.html"
+    def form_valid(self, form):
+        form.send_email()
+        return super().form_valid(form)
