@@ -18,6 +18,7 @@ class Post(models.Model):
     pub_date = models.DateTimeField("Дата публикации", auto_now_add=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="post_author", verbose_name="Автор")
     group = models.ForeignKey(Group, on_delete=models.CASCADE, blank=True, null=True, verbose_name="Группа")
+    image = models.ImageField(upload_to='posts/')  # поле для картинки
     class Meta:
         verbose_name = "Публикация"
         verbose_name_plural = "Публикации"

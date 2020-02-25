@@ -52,3 +52,9 @@ class PostsTest(TestCase):
         self.assertEqual(response.context["page"][0].text, 'An edited post')
         response = self.client.get('/testUser/1/')
         self.assertEqual(response.context["post"].text, 'An edited post')
+
+class Code404Error(TestCase):
+    def test_404_error(self):
+        client = Client()
+        response = client.get('/404/')
+        self.assertEqual(response.status_code, 404)

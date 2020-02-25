@@ -131,5 +131,6 @@ dmypy.json
 static/
 posts/static/
 
-posts/migrations
-sent_emails
+migrations/
+sent_emails/
+media/

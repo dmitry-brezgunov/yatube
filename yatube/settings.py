@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'sorl.thumbnail',
 ]
 
 MIDDLEWARE = [
@@ -135,6 +136,9 @@ STATIC_URL = "/static/"
 # задаём адрес директории, куда командой *collectstatic* будет собрана вся статика
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+
 # Login
 
 LOGIN_URL = "/auth/login/"
@@ -149,9 +153,9 @@ EMAIL_FILE_PATH = os.path.join(BASE_DIR, "sent_emails")
 # Идентификатор текущего сайта
 SITE_ID = 1
 
-LOGGING = {
-    "version": 1,
-    "disable_existing_loggers": False,
-    "handlers": {"console": {"level": "DEBUG", "class": "logging.StreamHandler"}},
-    "loggers": {"django.db.backends": {"handlers": ["console"], "level": "DEBUG"}},
-}
+# LOGGING = {
+#     "version": 1,
+#     "disable_existing_loggers": False,
+#     "handlers": {"console": {"level": "DEBUG", "class": "logging.StreamHandler"}},
+#     "loggers": {"django.db.backends": {"handlers": ["console"], "level": "DEBUG"}},
+# }

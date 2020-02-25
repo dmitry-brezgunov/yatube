@@ -76,3 +76,11 @@ def post_delete(request, username, post_id):
         post.delete()
         return redirect('profile', username=username)
     return redirect('post', post_id=post.pk, username=post.author)
+
+def page_not_found(request, exception): # noqa, pylint: disable=unused-argument
+    # Переменная exception содержит отладочную информацию,
+    # выводить её в шаблон пользователской страницы 404 мы не станем
+    return render(request, "misc/404.html", {"path": request.path}, status=404)
+
+def server_error(request):
+    return render(request, "misc/500.html", status=500)
