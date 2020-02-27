@@ -2,18 +2,20 @@
 {% block title %} Последние обновления {% endblock %}
 {% block content %}
 
-<h1> Последние обновления на сайте</h1>
-
-{% for post in page %}
-    <h3>
-        Автор: <a href="/{{ post.author.username }}/" style="text-decoration: none">{{ post.author.get_full_name }}</a>, Дата публикации: <a href="/{{ post.author.username }}/{{ post.pk }}/" style="text-decoration: none">{{ post.pub_date|date:"d M Y" }}</a>
-    </h3>
-    <p>{{ post.text|linebreaksbr }}</p>
-    <hr class="border border-primary">
-{% endfor %}
-
-{% if page.has_other_pages %}
-    {% include "paginator.html" with items=page paginator=paginator%}
-{% endif %}
+<main role="main" class="container">
+  {% include "menu.html" with index=True %}
+  <div class='table'>
+    <h1> Последние обновления на сайте</h1>
+      {% load cache %}
+      {% cache 20 index_page page %}
+      {% for post in page %}
+        {% include "post_item.html" with post=post %}
+      {% endfor %}  
+      {% endcache %} 
+  </div>
+  {% if page.has_other_pages %}
+      {% include "paginator.html" with items=page paginator=paginator%}
+  {% endif %}
+</main>
 
 {% endblock %}

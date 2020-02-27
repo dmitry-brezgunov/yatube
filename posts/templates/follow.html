@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %} Ваши подписки {% endblock %}
+{% block content %}
+
+
+<main role="main" class="container">
+  {% include "menu.html" with index=True %}
+  <div class='table'>
+    {% if following %}
+      <h1> Последние публикации избранных авторов </h1>
+        {% for post in page %}
+          {% include "post_item.html" with post=post %}
+        {% endfor %}
+    {% else %}
+      <h1> У вас пока нет избранных авторов </h1>
+    {% endif %}
+
+    {% if page.has_other_pages %}
+      {% include "paginator.html" with items=page paginator=paginator%}
+    {% endif %}
+  </div>
+</main>
+
+{% endblock %}
