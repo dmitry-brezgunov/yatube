@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db.models import Count
 
-from .models import Post, Group, User, Comment, Favorite
+from .models import Post, Group, User, Comment, Follow
 from .forms import PostForm, CommentForm
 
 def index(request):
@@ -57,8 +57,8 @@ def post_view(request, post_id, username):
                              pk=post_id)
     post_count = Post.objects.filter(author=user_profile).count()
     post_comment = Comment.objects.filter(post=post_id).select_related('author').all()
-    follower_count = Favorite.objects.filter(author=user_profile).count()
-    following_count = Favorite.objects.filter(user=user_profile).count()
+    follower_count = Follow.objects.filter(author=user_profile).count()
+    following_count = Follow.objects.filter(user=user_profile).count()
     form = CommentForm()
     return render(request, 'post_view.html', {'post':post,
                                               'profile':user_profile,
@@ -78,10 +78,10 @@ def profile(request, username):
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
     following = False
-    follower_count = Favorite.objects.filter(author=user_profile).count()
-    following_count = Favorite.objects.filter(user=user_profile).count()
+    follower_count = Follow.objects.filter(author=user_profile).count()
+    following_count = Follow.objects.filter(user=user_profile).count()
     if request.user.is_authenticated:
-        if Favorite.objects.filter(author=user_profile, user=request.user).count():
+        if Follow.objects.filter(author=user_profile, user=request.user).count():
             following = True
     return render(request, "profile.html", {'profile':user_profile,
                                             'page':page,
@@ -93,7 +93,7 @@ def profile(request, username):
 @login_required
 def post_edit(request, username, post_id):
     title = 'Редактировать'
-    post = get_object_or_404(Post, pk=post_id)
+    post = get_object_or_404(Post.objects.select_related('author'), pk=post_id)
     if request.user == post.author:
         if request.method == "POST":
             form = PostForm(request.POST or None, files=request.FILES or None, instance=post)
@@ -141,8 +141,8 @@ def add_comment(request, username, post_id):
 def follow_index(request):
     follow_page = True
     following = False
-    if Favorite.objects.filter(user=request.user).count():
-        favorites = Favorite.objects.filter(user=request.user).select_related('author')
+    if Follow.objects.filter(user=request.user).count():
+        favorites = Follow.objects.filter(user=request.user).select_related('author')
         favorite_authors = []
         for item in favorites:
             favorite_authors.append(item.author.id)
@@ -165,12 +165,12 @@ def profile_follow(request, username):
     followed_author = get_object_or_404(User, username=username)
     if followed_author == request.user:
         return redirect('profile', username=username)
-    Favorite.objects.create(author=followed_author, user=request.user)
+    Follow.objects.create(author=followed_author, user=request.user)
     return redirect('profile', username=username)
 
 @login_required
 def profile_unfollow(request, username):
     followed_author = get_object_or_404(User, username=username)
-    follover = Favorite.objects.filter(author=followed_author, user=request.user)
+    follover = Follow.objects.filter(author=followed_author, user=request.user)
     follover.delete()
     return redirect('profile', username=username)

@@ -1,7 +1,7 @@
 from django.test import TestCase, Client
 from django.core import mail
 from django.core.cache import cache
-from posts.models import User, Post, Group, Favorite
+from posts.models import User, Post, Group, Follow
 
 class SignUpTest(TestCase):
     def setUp(self):
@@ -123,7 +123,7 @@ class CacheTest(TestCase):
         response = self.client.get('/')
         self.assertContains(response, 'A test post 2', status_code=200)
 
-class FavoritesTest(TestCase):
+class FollowTest(TestCase):
     def setUp(self):
         self.client = Client()
         self.user1 = User.objects.create_user(username="testUser1",
@@ -146,11 +146,11 @@ class FavoritesTest(TestCase):
         self.client.login(username="testUser1", password="*yxW$kE81")
         response = self.client.get('/testUser2/follow')
         self.assertRedirects(response, '/testUser2/')
-        follower = Favorite.objects.get(user=self.user1, author=self.user2)
+        follower = Follow.objects.get(user=self.user1, author=self.user2)
         self.assertIsNotNone(follower)
         response = self.client.get('/testUser2/unfollow')
         self.assertRedirects(response, '/testUser2/')
-        follower = Favorite.objects.filter(user=self.user1, author=self.user2).first()
+        follower = Follow.objects.filter(user=self.user1, author=self.user2).first()
         self.assertIsNone(follower)
 
     def test_follow_posts(self):
