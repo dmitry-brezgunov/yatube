@@ -1,20 +1,25 @@
 {% extends "base.html" %}
-{% block title %}{{ title }} запись{% endblock %}
+{% block title %}{{ title }}{% endblock %}
 {% block content %}
-{% load user_filters %}
 
 <div class="d-flex flex-column">
   <div class="p-5">
     <div class="card">
-      <div class="card-header text-center">{{ title }} запись</div>
+      <div class="card-header text-center">{{ title }}</div>
       <div class="card-body">
+        {% if form.errors %}
+          {% for error in form.errors %}
+            <div class="alert alert-danger" role="alert">
+              {{ error|escape }}
+            </div>
+          {% endfor %}
+        {% endif %}
         <form method="POST" enctype="multipart/form-data">
           {% csrf_token %}
           {% for field in form %}
           <div class="form-group row" aria-required={% if field.field.required %}"true"{% else %}"false"{% endif %}>
             <label for="{{ field.id_for_label }}" class="col-sm-2">{{ field.label }}{% if field.field.required %}<span class="required">*</span>{% endif %}</label>
             <div class="col-sm-10">
-              {# подключаем фильтр и указываем класс #}
               {{ field }}
               {% if field.help_text %}
               <small id="{{ field.id_for_label }}-help" class="form-text text-muted">{{ field.help_text|safe }}</small>

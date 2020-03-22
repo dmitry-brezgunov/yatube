@@ -25,7 +25,20 @@
     <h5 class="mt-0">
       <a href="{% url 'profile' comment.author.username %}" name="comment_{{ comment.id }}">{{ comment.author.username }}</a>
     </h5>
-    {{ comment.text }}
+    <p> {{ comment.text }} </p>
+    <div class="d-flex justify-content-between align-items-center">
+      <div class="btn-group ">
+        {% if user == comment.author %}
+          <a class="btn btn-sm text-muted" href="{% url 'edit_comment' post.author.username post.id comment.id %}" role="button">
+            Редактировать
+          </a>
+          <a class="btn btn-sm text-muted" href="{% url 'delete_comment' post.author.username post.id comment.id %}" role="button">
+            Удалить
+          </a>
+        {% endif %}
+      </div>
+      <small class="text-muted">{{ comment.created }}</small>
+    </div>
   </div>
 </div>
 {% endfor %}

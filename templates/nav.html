@@ -9,6 +9,8 @@
       <span class="navbar-text text-reset">Пользователь: {{ user.username }}.</span>
       <a class="nav-item nav-link" href="{% url 'new_post' %}">Опубликовать запись</a>
       <span class="navbar-text">|</span>
+      <a class="nav-item nav-link" href="{% url 'add_group' %}">Добавить группу</a>
+      <span class="navbar-text">|</span>
       <a class="nav-item nav-link" href="{% url 'password_change' %}">Изменить пароль</a>
       <span class="navbar-text">|</span>
       <a class="nav-item nav-link" href="{% url 'logout' %}">Выйти</a>

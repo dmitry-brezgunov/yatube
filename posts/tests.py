@@ -1,4 +1,5 @@
-from django.test import TestCase, Client
+import tempfile
+from django.test import TestCase, Client, override_settings
 from django.core import mail
 from django.core.cache import cache
 from posts.models import User, Post, Group, Follow
@@ -21,6 +22,7 @@ class SignUpTest(TestCase):
         response = self.client.get('/testUser/')
         self.assertEqual(response.status_code, 200)
 
+@override_settings(CACHES={'default': {'BACKEND': 'django.core.cache.backends.dummy.DummyCache'}})
 class PostsTest(TestCase):
     def setUp(self):
         self.client = Client()
@@ -40,7 +42,6 @@ class PostsTest(TestCase):
         self.assertEqual(response.status_code, 200)
         response = self.client.post('/new/', {'text':'A test post'})
         self.assertRedirects(response, '/')
-        cache.clear()
         response = self.client.get('/')
         self.assertEqual(response.context["page"][0].text, 'A test post')
         response = self.client.get('/testUser/')
@@ -55,7 +56,6 @@ class PostsTest(TestCase):
         self.assertEqual(response.status_code, 200)
         response = self.client.post('/testUser/1/edit/', {'text':'An edited post'})
         self.assertRedirects(response, '/testUser/1/')
-        cache.clear()
         response = self.client.get('/')
         self.assertEqual(response.context["page"][0].text, 'An edited post')
         response = self.client.get('/testUser/')
@@ -69,6 +69,8 @@ class Code404Error(TestCase):
         response = client.get('/404/')
         self.assertEqual(response.status_code, 404)
 
+@override_settings(CACHES={'default': {'BACKEND': 'django.core.cache.backends.dummy.DummyCache'}},
+                   MEDIA_ROOT=tempfile.gettempdir())
 class PostsImgTest(TestCase):
     def setUp(self):
         self.client = Client()
@@ -85,7 +87,6 @@ class PostsImgTest(TestCase):
     def test_img_upload(self):
         with open('test-img.jpg', 'rb') as fp:
             self.client.post('/new/', {'group':1, 'text':'Test post', 'image':fp,})
-        cache.clear()
         response = self.client.get('/testUser/1/')
         self.assertContains(response, '<img class="card-img"', status_code=200)
         response = self.client.get('/')
