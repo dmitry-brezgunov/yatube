@@ -128,8 +128,7 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-static/
-posts/static/
+.vscode
 
 migrations/
 sent_emails/
