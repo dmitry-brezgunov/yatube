@@ -130,7 +130,6 @@ dmypy.json
 
 migrations/
 sent_emails/
-media/
 users/migrations
 
 test-img.jpg
