@@ -134,3 +134,7 @@ users/migrations
 
 test-img.jpg
 test-file.txt
+
+static/
+media/
+db.sqlite3
