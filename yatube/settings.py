@@ -50,7 +50,7 @@ ALLOWED_HOSTS = [
 
 INSTALLED_APPS = [
     'users',
-    'posts', # наше приложение posts**
+    'posts',
     "django.contrib.sites",
     "django.contrib.flatpages",
     'django.contrib.admin',
@@ -141,11 +141,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
-# задаём произвольный URL, который будет использоваться для запросов к статическим файлам
 STATIC_URL = "/static/"
-# теперь логотип можно будет запросить по адресу sitename.ex**/static/**images/logo.png
 
-# задаём адрес директории, куда командой *collectstatic* будет собрана вся статика
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
 MEDIA_URL = "/media/"
@@ -157,12 +154,9 @@ LOGIN_URL = "/auth/login/"
 LOGIN_REDIRECT_URL = "index"
 LOGOUT_REDIRECT_URL = "index"
 
-#  подключаем движок filebased.EmailBackend
 EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
-# указываем директорию, в которую будут складываться файлы писем
 EMAIL_FILE_PATH = os.path.join(BASE_DIR, "sent_emails")
 
-# Идентификатор текущего сайта
 SITE_ID = 1
 
 CACHES = {

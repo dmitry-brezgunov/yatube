@@ -1,15 +1,17 @@
 from django import template
-# В template.Library зарегистрированы все теги и фильтры шаблонов
-# добавляем к ним и наш фильтр
+
 register = template.Library()
 
 
 @register.filter
 def addclass(field, css):
+    '''Фильтр для добавления класса к полю в шаблоне'''
     return field.as_widget(attrs={"class": css})
+
 
 @register.filter
 def format_count(word, count):
+    '''Фильтр для склонение слова 'комментарий' по числу'''
     remainder_ten = count % 10
     remainder_hundred = count % 100
     if remainder_ten == 0:

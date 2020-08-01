@@ -4,26 +4,32 @@ from django.core import mail
 from django.core.cache import cache
 from posts.models import User, Post, Group, Follow
 
+
 class SignUpTest(TestCase):
+    '''Тестирование регистрации пользователя'''
     def setUp(self):
         self.client = Client()
 
     def test_signup(self):
         response = self.client.get('/auth/signup/')
         self.assertEqual(response.status_code, 200)
-        response = self.client.post('/auth/signup/', {'username':'testUser',
-                                                      'email':'test@user.com',
-                                                      'password1':'*yxW$kE8',
-                                                      'password2':'*yxW$kE8'})
+        response = self.client.post('/auth/signup/', {'username': 'testUser',
+                                                      'email': 'test@user.com',
+                                                      'password1': '*yxW$kE8',
+                                                      'password2': '*yxW$kE8'})
         self.assertRedirects(response, '/auth/login/')
         self.assertEqual(User.objects.count(), 1)
         self.assertEqual(len(mail.outbox), 1)
-        self.assertEqual(mail.outbox[0].subject, 'Подтверждение регистрации Yatube')
+        self.assertEqual(
+            mail.outbox[0].subject, 'Подтверждение регистрации Yatube')
         response = self.client.get('/testUser/')
         self.assertEqual(response.status_code, 200)
 
-@override_settings(CACHES={'default': {'BACKEND': 'django.core.cache.backends.dummy.DummyCache'}})
+
+@override_settings(CACHES={
+    'default': {'BACKEND': 'django.core.cache.backends.dummy.DummyCache'}})
 class PostsTest(TestCase):
+    '''Тестирование публикаций'''
     def setUp(self):
         self.client = Client()
         self.user = User.objects.create_user(username="testUser",
@@ -40,7 +46,7 @@ class PostsTest(TestCase):
         self.client.login(username="testUser", password="*yxW$kE8")
         response = self.client.get('/new/')
         self.assertEqual(response.status_code, 200)
-        response = self.client.post('/new/', {'text':'A test post'})
+        response = self.client.post('/new/', {'text': 'A test post'})
         self.assertRedirects(response, '/')
         response = self.client.get('/')
         self.assertEqual(response.context["page"][0].text, 'A test post')
@@ -54,7 +60,8 @@ class PostsTest(TestCase):
         Post.objects.create(text="A test post", author=self.user)
         response = self.client.get('/testUser/1/edit/')
         self.assertEqual(response.status_code, 200)
-        response = self.client.post('/testUser/1/edit/', {'text':'An edited post'})
+        response = self.client.post(
+            '/testUser/1/edit/', {'text': 'An edited post'})
         self.assertRedirects(response, '/testUser/1/')
         response = self.client.get('/')
         self.assertEqual(response.context["page"][0].text, 'An edited post')
@@ -63,15 +70,19 @@ class PostsTest(TestCase):
         response = self.client.get('/testUser/1/')
         self.assertEqual(response.context["post"].text, 'An edited post')
 
+
 class Code404Error(TestCase):
     def test_404_error(self):
         client = Client()
         response = client.get('/404/')
         self.assertEqual(response.status_code, 404)
 
-@override_settings(CACHES={'default': {'BACKEND': 'django.core.cache.backends.dummy.DummyCache'}},
+
+@override_settings(CACHES={
+    'default': {'BACKEND': 'django.core.cache.backends.dummy.DummyCache'}},
                    MEDIA_ROOT=tempfile.gettempdir())
 class PostsImgTest(TestCase):
+    '''Тестирование возможности добавления изображений к публикациям'''
     def setUp(self):
         self.client = Client()
         User.objects.create_user(username="testUser",
@@ -86,7 +97,8 @@ class PostsImgTest(TestCase):
 
     def test_img_upload(self):
         with open('test-img.jpg', 'rb') as fp:
-            self.client.post('/new/', {'group':1, 'text':'Test post', 'image':fp,})
+            self.client.post(
+                '/new/', {'group': 1, 'text': 'Test post', 'image': fp, })
         response = self.client.get('/testUser/1/')
         self.assertContains(response, '<img class="card-img"', status_code=200)
         response = self.client.get('/')
@@ -98,12 +110,16 @@ class PostsImgTest(TestCase):
 
     def test_file_upload(self):
         with open('test-file.txt', 'rb') as fp:
-            response = self.client.post('/new/', {'group':1, 'text':'Test post', 'image':fp,})
+            response = self.client.post(
+                '/new/', {'group': 1, 'text': 'Test post', 'image': fp, })
         self.assertFormError(response, 'form', 'image',
                              "Загрузите правильное изображение. "
-                             "Файл, который вы загрузили, поврежден или не является изображением.")
+                             "Файл, который вы загрузили, поврежден "
+                             "или не является изображением.")
+
 
 class CacheTest(TestCase):
+    ''''Тестирование работы кеширования главной страницы'''
     def setUp(self):
         self.client = Client()
         self.user = User.objects.create_user(username="testUser",
@@ -117,14 +133,16 @@ class CacheTest(TestCase):
     def test_index_cache(self):
         response = self.client.get('/')
         self.assertContains(response, 'A test post', status_code=200)
-        self.client.post('/new/', {'text':'A test post 2'})
+        self.client.post('/new/', {'text': 'A test post 2'})
         response = self.client.get('/')
         self.assertNotContains(response, 'A test post 2', status_code=200)
         cache.clear()
         response = self.client.get('/')
         self.assertContains(response, 'A test post 2', status_code=200)
 
+
 class FollowTest(TestCase):
+    '''Тестирование подписок'''
     def setUp(self):
         self.client = Client()
         self.user1 = User.objects.create_user(username="testUser1",
@@ -151,7 +169,8 @@ class FollowTest(TestCase):
         self.assertIsNotNone(follower)
         response = self.client.get('/testUser2/unfollow')
         self.assertRedirects(response, '/testUser2/')
-        follower = Follow.objects.filter(user=self.user1, author=self.user2).first()
+        follower = Follow.objects.filter(
+            user=self.user1, author=self.user2).first()
         self.assertIsNone(follower)
 
     def test_follow_posts(self):
@@ -164,7 +183,9 @@ class FollowTest(TestCase):
         response = self.client.get('/follow/')
         self.assertNotContains(response, 'A test post', status_code=200)
 
+
 class CommentsTest(TestCase):
+    '''Тестирование комментариев'''
     def setUp(self):
         self.client = Client()
         self.user1 = User.objects.create_user(username="testUser1",
@@ -176,9 +197,11 @@ class CommentsTest(TestCase):
 
     def test_comments(self):
         response = self.client.get('/testUser1/1/comment/')
-        self.assertRedirects(response, '/auth/login/?next=/testUser1/1/comment/')
+        self.assertRedirects(
+            response, '/auth/login/?next=/testUser1/1/comment/')
         self.client.login(username="testUser1", password="*yxW$kE81")
-        response = self.client.post('/testUser1/1/comment/', {'text':'A test comment'})
+        response = self.client.post(
+            '/testUser1/1/comment/', {'text': 'A test comment'})
         self.assertRedirects(response, '/testUser1/1/')
         response = self.client.get('/testUser1/1/')
         self.assertContains(response, 'A test comment', status_code=200)
