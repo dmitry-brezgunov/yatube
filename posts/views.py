@@ -1,12 +1,11 @@
-from django.shortcuts import render, get_object_or_404
-from django.shortcuts import redirect
-from django.utils import timezone
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db.models import Count
+from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
 
-from .models import Post, Group, User, Comment, Follow
-from .forms import PostForm, CommentForm, GroupForm
+from .forms import CommentForm, GroupForm, PostForm
+from .models import Comment, Follow, Group, Post, User
 
 
 def index(request):

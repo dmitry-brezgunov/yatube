@@ -1,8 +1,10 @@
 import tempfile
-from django.test import TestCase, Client, override_settings
+
 from django.core import mail
 from django.core.cache import cache
-from posts.models import User, Post, Group, Follow
+from django.test import Client, TestCase, override_settings
+
+from posts.models import Follow, Group, Post, User
 
 
 class SignUpTest(TestCase):
